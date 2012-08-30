@@ -68,7 +68,7 @@ module CopycopterClient
         end
       elsif data.respond_to?(:to_str)
         key = ([locale] + scope).join('.')
-        cache[key] = data.to_str unless scope ignore_prefix(scope.first)
+        cache[key] = data.to_str unless scope && ignore_prefix(scope.first)
       end
     end
 
