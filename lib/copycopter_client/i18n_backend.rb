@@ -57,7 +57,7 @@ module CopycopterClient
       parts = I18n.normalize_keys(locale, key, scope, options[:separator])
       key_with_locale = parts.join('.')
       content = cache[key_with_locale] || super
-      cache[key_with_locale] = "" if content.nil?
+      cache[key_with_locale] = "" if content.nil? && ! ignore_prefix(parts[1])
       content
     end
 
@@ -68,7 +68,7 @@ module CopycopterClient
         end
       elsif data.respond_to?(:to_str)
         key = ([locale] + scope).join('.')
-        cache[key] = data.to_str
+        cache[key] = data.to_str unless scope ignore_prefix(scope.first)
       end
     end
 
@@ -82,9 +82,13 @@ module CopycopterClient
       if content.respond_to?(:to_str)
         parts = I18n.normalize_keys(locale, object, options[:scope], options[:separator])
         key = parts.join('.')
-        cache[key] = content.to_str
+        cache[key] = content.to_str unless ignore_prefix(parts[1])
       end
       content
+    end
+
+    def ignore_prefix(prefix)
+      prefix && CopycopterClient.configuration.ignore_prefixes.include?(prefix.to_s)
     end
 
     attr_reader :cache

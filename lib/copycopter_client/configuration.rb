@@ -16,7 +16,7 @@ module CopycopterClient
         :http_open_timeout, :http_read_timeout, :client_name, :client_url,
         :client_version, :port, :protocol, :proxy_host, :proxy_pass,
         :proxy_port, :proxy_user, :secure, :polling_delay, :logger,
-        :framework, :middleware, :ca_file].freeze
+        :framework, :middleware, :ca_file, :ignore_prefixes].freeze
 
     # @return [String] The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -87,6 +87,9 @@ module CopycopterClient
     # @return [Client] instance used to communicate with a Copycopter Server.
     attr_accessor :client
 
+    # @return [Array<String>] A list of prefixes to not send to the copycopter-server
+    attr_accessor :ignore_prefixes
+
     alias_method :secure?, :secure
 
     # Instantiated from {CopycopterClient.configure}. Sets defaults.
@@ -102,6 +105,7 @@ module CopycopterClient
       self.polling_delay = 300
       self.secure = false
       self.test_environments = %w(test cucumber)
+      self.ignore_prefixes = []
       @applied = false
     end
 
@@ -211,6 +215,11 @@ module CopycopterClient
       @logger = PrefixedLogger.new("** [Copycopter]", original_logger)
     end
 
+    # Ensures the values in ignore_prefixes are strings
+    # @param prefixes [Array] the prefixes to ignore
+    def ignore_prefixes=(prefixes)
+      @ignore_prefixes = prefixes.map(&:to_s)
+    end
     private
 
     def default_port
